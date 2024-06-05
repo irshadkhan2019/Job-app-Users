@@ -11,6 +11,8 @@ import { verify } from 'jsonwebtoken';
 import compression from 'compression';
 import { checkConnection } from '@users/elasticsearch';
 import { appRoutes } from '@users/routes';
+import { createConnection } from '@users/queues/connection';
+import { Channel } from 'amqplib';
 
 
 const SERVER_PORT = 4003;
@@ -21,6 +23,7 @@ const start = (app: Application): void => {
   standardMiddleware(app);
   routesMiddleware(app);
   startElasticSearch();
+  startQueues();
   usersErrorHandler(app);
   startServer(app);
 };
@@ -60,7 +63,14 @@ const routesMiddleware = (app: Application): void => {
 
 const startElasticSearch = (): void => {
   checkConnection();
+
 };
+
+const startQueues = async (): Promise<void> => {
+  const userChannel:Channel= await createConnection() as Channel;
+
+};
+
 
 const usersErrorHandler = (app: Application): void => {
   app.use((error: IErrorResponse, _req: Request, res: Response, next: NextFunction) => {
